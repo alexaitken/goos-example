@@ -1,0 +1,84 @@
+package com.alexaitken.auctionsniper.ui;
+
+import javax.swing.SwingUtilities;
+
+import org.jivesoftware.smack.Chat;
+import org.jivesoftware.smack.MessageListener;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Message;
+
+public class Main {
+	
+	public static final String AUCTION_RESOURCE = "Auction";
+	public static final String ITEM_ID_AS_LOGIN = "auction-%s";
+	public static final String AUCTION_ID_FORMAT = ITEM_ID_AS_LOGIN + "@%s/" + AUCTION_RESOURCE;
+	
+	
+	
+	public static void main(String ...args) throws Exception {
+		Main main = new Main();
+		main.joinAuction(connectTo(args[0], args[1], args[2]),args[3]);
+	}
+
+	private static XMPPConnection connectTo(String hostName, String signIn, String password) throws XMPPException {
+		XMPPConnection xmppConnection = new XMPPConnection(hostName);
+		xmppConnection.connect();
+		xmppConnection.login(signIn, password);
+		return xmppConnection;
+	}
+	
+
+	
+	private MainWindow ui;
+	
+	@SuppressWarnings("unused")
+	private Chat notToBeGcd;
+
+	
+	
+	public Main() throws Exception {
+		startUserInterface();
+	}
+	
+
+
+	private void joinAuction(XMPPConnection connection, String itemNumber) throws XMPPException {
+		final Chat chat = connection.getChatManager().createChat(
+				autionId(connection, itemNumber), 
+				new MessageListener() {
+					
+					@Override
+					public void processMessage(Chat arg0, Message arg1) {
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								ui.showStatus(MainWindow.STATUS_LOST);
+							}
+						});
+						
+					}
+				});
+		this.notToBeGcd = chat;
+		chat.sendMessage(new Message());
+	}
+
+
+
+	private static String autionId(XMPPConnection connection, String itemNumber) {
+		return String.format(AUCTION_ID_FORMAT, itemNumber, connection.getServiceName());
+	}
+
+
+
+	
+	private void startUserInterface() throws Exception {
+		SwingUtilities.invokeAndWait(new Runnable() {
+			@Override
+			public void run() {
+				ui = new MainWindow();
+			}
+		});
+		
+	}
+
+}
