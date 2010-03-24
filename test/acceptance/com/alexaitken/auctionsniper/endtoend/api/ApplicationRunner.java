@@ -7,6 +7,10 @@ import com.alexaitken.auctionsniper.ui.Main;
 
 public class ApplicationRunner {
 	protected static final String XMPP_HOST = "localhost";
+
+	public static final String SNIPER_XMPP_ID = "sniper@sideshow-bob.local/Smack";
+
+	
 	
 	private final String SNIPER_ID = "sniper";
 	private final String SNIPPER_PASSWORD = "sniper";
@@ -39,6 +43,10 @@ public class ApplicationRunner {
 		if (driver != null) {
 			driver.dispose();
 		}
+	}
+
+	public void hasShownSniperIsBidding() {
+		driver.showsSniperStatus(STATUS_BIDDING); 		
 	}
 
 }

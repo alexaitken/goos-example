@@ -1,5 +1,8 @@
 package com.alexaitken.auctionsniper.ui;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 import javax.swing.SwingUtilities;
 
 import org.jivesoftware.smack.Chat;
@@ -13,7 +16,9 @@ public class Main {
 	public static final String AUCTION_RESOURCE = "Auction";
 	public static final String ITEM_ID_AS_LOGIN = "auction-%s";
 	public static final String AUCTION_ID_FORMAT = ITEM_ID_AS_LOGIN + "@%s/" + AUCTION_RESOURCE;
-	
+	public static final String BID_COMMAND_FORMAT = "SOLVersion: 1.1; Event: BID; Price: %d;";
+	public static final String JOIN_COMMAND_FORMAT = "SOLVersion: 1.1; Event: JOIN;";
+
 	
 	
 	public static void main(String ...args) throws Exception {
@@ -34,7 +39,7 @@ public class Main {
 	
 	@SuppressWarnings("unused")
 	private Chat notToBeGcd;
-
+	
 	
 	
 	public Main() throws Exception {
@@ -44,6 +49,7 @@ public class Main {
 
 
 	private void joinAuction(XMPPConnection connection, String itemNumber) throws XMPPException {
+		disconnectWhenUICloses(connection);
 		final Chat chat = connection.getChatManager().createChat(
 				autionId(connection, itemNumber), 
 				new MessageListener() {
@@ -59,10 +65,19 @@ public class Main {
 					}
 				});
 		this.notToBeGcd = chat;
-		chat.sendMessage(new Message());
+		chat.sendMessage(JOIN_COMMAND_FORMAT);
 	}
 
 
+
+	private void disconnectWhenUICloses(final XMPPConnection connection) {
+		ui.addWindowListener(new WindowAdapter() {
+			public void windowClosed(WindowEvent e) {
+				connection.disconnect();
+			}
+		});
+		
+	}
 
 	private static String autionId(XMPPConnection connection, String itemNumber) {
 		return String.format(AUCTION_ID_FORMAT, itemNumber, connection.getServiceName());

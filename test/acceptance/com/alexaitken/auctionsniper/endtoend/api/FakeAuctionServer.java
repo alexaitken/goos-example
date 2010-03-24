@@ -1,17 +1,18 @@
 package com.alexaitken.auctionsniper.endtoend.api;
 
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.hamcrest.Matcher;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManagerListener;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
-import org.junit.Assert;
 
 import com.alexaitken.auctionsniper.ui.Main;
 
@@ -43,15 +44,35 @@ public class FakeAuctionServer {
 					}
 				});
 	}
+	
+	
+	public void reportPrice(int price, int increment, String bidder) throws XMPPException {
+		currentChat.sendMessage(
+				String.format("SOLVersion 1.1; Event: PRICE; "
+						+ "CurrentPrice: %d; Increment: %d; Bidder: %s;",
+						price, increment, bidder));
+		
+	}
 
-	public void hasReceivedJoinRequestFromSniper() throws InterruptedException {
-		messageListener.receivesAMessage();
+	public void hasReceivedJoinRequestFromSniper(String sniperId) throws InterruptedException {
+		hasReceivedAMessageMatching(sniperId, equalTo(Main.JOIN_COMMAND_FORMAT));
 	}
 
 	public void announceClosed() throws XMPPException {
 		currentChat.sendMessage(new Message());
-		
 	}
+	
+	public void hasReceivedBid(int bid, String sniperId) throws InterruptedException {
+		hasReceivedAMessageMatching(sniperId, equalTo(String.format(Main.BID_COMMAND_FORMAT, bid)));
+	}
+	
+	private void hasReceivedAMessageMatching(String sniperId, Matcher<? super String> messageMather) throws InterruptedException {
+		messageListener.receivesAMessage(messageMather);
+		String participant = currentChat.getParticipant();
+		assertThat(participant, equalTo(sniperId));
+
+	}
+	
 
 	public void stop() {
 		connection.disconnect();
@@ -73,8 +94,16 @@ public class FakeAuctionServer {
 		}
 		
 		
-		public void receivesAMessage() throws InterruptedException {
-			Assert.assertThat("Message", messages.poll(20, TimeUnit.SECONDS), is(notNullValue()));
+		public void receivesAMessage(Matcher<? super String> messageMatcher) throws InterruptedException {
+			final Message message = messages.poll(10, TimeUnit.SECONDS);
+			assertThat("Message", message, is(notNullValue()));
+			assertThat(message.getBody(), messageMatcher);
 		}
+
+
+		
 	}
+
+
+	
 }

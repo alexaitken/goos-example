@@ -9,6 +9,7 @@ import javax.swing.border.LineBorder;
 public class MainWindow extends JFrame {
 	public static final String STATUS_JOINING = "JOIN";
 	public static final String STATUS_LOST = "LOST";
+	public static final String STATUS_BIDDING = "BIDDING";
 	
 	
 	private final JLabel sniperStatus = createLabel(STATUS_JOINING);
