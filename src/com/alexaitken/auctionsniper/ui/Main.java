@@ -6,12 +6,13 @@ import java.awt.event.WindowEvent;
 import javax.swing.SwingUtilities;
 
 import org.jivesoftware.smack.Chat;
-import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Message;
 
-public class Main {
+import com.alexaitken.auctionsniper.AuctionEventListener;
+import com.alexaitken.auctionsniper.AuctionMessageTranslator;
+
+public class Main implements AuctionEventListener {
 	
 	public static final String AUCTION_RESOURCE = "Auction";
 	public static final String ITEM_ID_AS_LOGIN = "auction-%s";
@@ -52,18 +53,7 @@ public class Main {
 		disconnectWhenUICloses(connection);
 		final Chat chat = connection.getChatManager().createChat(
 				autionId(connection, itemNumber), 
-				new MessageListener() {
-					
-					@Override
-					public void processMessage(Chat arg0, Message arg1) {
-						SwingUtilities.invokeLater(new Runnable() {
-							public void run() {
-								ui.showStatus(MainWindow.STATUS_LOST);
-							}
-						});
-						
-					}
-				});
+				new AuctionMessageTranslator(this));
 		this.notToBeGcd = chat;
 		chat.sendMessage(JOIN_COMMAND_FORMAT);
 	}
@@ -93,6 +83,22 @@ public class Main {
 				ui = new MainWindow();
 			}
 		});
+		
+	}
+
+	@Override
+	public void auctionClosed() {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				ui.showStatus(MainWindow.STATUS_LOST);
+			}
+		});
+		
+	}
+
+	@Override
+	public void currentPrice(int price, int increment) {
+		// TODO Auto-generated method stub
 		
 	}
 
