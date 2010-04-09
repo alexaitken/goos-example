@@ -9,10 +9,12 @@ import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 
-import com.alexaitken.auctionsniper.AuctionEventListener;
+import com.alexaitken.auctionsniper.Auction;
 import com.alexaitken.auctionsniper.AuctionMessageTranslator;
+import com.alexaitken.auctionsniper.AuctionSniper;
+import com.alexaitken.auctionsniper.SniperListener;
 
-public class Main implements AuctionEventListener {
+public class Main implements SniperListener {
 	
 	public static final String AUCTION_RESOURCE = "Auction";
 	public static final String ITEM_ID_AS_LOGIN = "auction-%s";
@@ -51,11 +53,13 @@ public class Main implements AuctionEventListener {
 
 	private void joinAuction(XMPPConnection connection, String itemNumber) throws XMPPException {
 		disconnectWhenUICloses(connection);
-		final Chat chat = connection.getChatManager().createChat(
-				autionId(connection, itemNumber), 
-				new AuctionMessageTranslator(this));
+		final Chat chat = connection.getChatManager().createChat(autionId(connection, itemNumber), null);
 		this.notToBeGcd = chat;
-		chat.sendMessage(JOIN_COMMAND_FORMAT);
+		
+		Auction auction =  new XMPPAuction(chat);
+		
+		chat.addMessageListener(new AuctionMessageTranslator(new AuctionSniper(auction, this)));
+		auction.join();
 	}
 
 
@@ -86,8 +90,7 @@ public class Main implements AuctionEventListener {
 		
 	}
 
-	@Override
-	public void auctionClosed() {
+	public void sniperLost() {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				ui.showStatus(MainWindow.STATUS_LOST);
@@ -97,9 +100,40 @@ public class Main implements AuctionEventListener {
 	}
 
 	@Override
-	public void currentPrice(int price, int increment) {
-		// TODO Auto-generated method stub
+	public void sniperBidding() {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				ui.showStatus(MainWindow.STATUS_BIDDING);
+			}
+		});
 		
 	}
 
+
+	
+	public class SinperStateDisplayer implements SniperListener {
+
+		public void sniperLost() {
+			showStatus(MainWindow.STATUS_LOST);
+			
+		}
+
+		
+		@Override
+		public void sniperBidding() {
+			showStatus(MainWindow.STATUS_BIDDING);
+		}
+		
+		private void showStatus(final String status) {
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					ui.showStatus(status);
+				}
+			});
+		}
+
+
+	}
 }
+
+

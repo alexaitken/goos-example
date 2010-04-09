@@ -31,7 +31,7 @@ public class ApplicationRunner {
 		
 		thread.setDaemon(true);
 		thread.start();
-		driver = new AuctionSniperDriver(1000);
+		driver = new AuctionSniperDriver(5000);
 		driver.showsSniperStatus(STATUS_JOINING);
 	}
 

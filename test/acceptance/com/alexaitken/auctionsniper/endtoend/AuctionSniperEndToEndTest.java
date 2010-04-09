@@ -58,7 +58,6 @@ public class AuctionSniperEndToEndTest {
 		
 		auction.announceClosed();
 		application.showSniperHasLostAuction();
-		
 	}
 	
 }
