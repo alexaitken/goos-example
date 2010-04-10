@@ -1,5 +1,7 @@
 package com.alexaitken.test.auctionsniper;
 
+import static org.junit.Assert.*;
+
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.States;
@@ -79,6 +81,24 @@ public class AuctionSniperTest {
 		}});
 		
 		sniper.currentPrice(1, 1, PriceSource.FromSniper);
+	}
+	
+	
+	
+	@Test
+	public void reports_bidding_after_a_new_bid_causes_the_sniper_to_no_longer_be_winning() throws Exception {
+		context.checking(new Expectations() {{
+			ignoring(auction);
+			atLeast(1).of(sniperListener).sniperBidding(); when(sniperState.isNot("winning"));
+			allowing(sniperListener).sniperWinning(); then(sniperState.is("winning"));
+			
+			atLeast(1).of(sniperListener).sniperBidding(); when(sniperState.is("winning"));
+			
+		}});
+		sniper.currentPrice(123, 45, PriceSource.FromOtherBidder);
+		sniper.currentPrice(145, 67, PriceSource.FromSniper);
+		sniper.currentPrice(167, 89, PriceSource.FromOtherBidder);
+		
 	}
 	
 }
