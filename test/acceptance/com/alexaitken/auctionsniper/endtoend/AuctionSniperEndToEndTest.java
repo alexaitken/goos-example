@@ -39,7 +39,7 @@ public class AuctionSniperEndToEndTest {
 		application.startBiddingIn(auction);
 		auction.hasReceivedJoinRequestFromSniper(ApplicationRunner.SNIPER_XMPP_ID);
 		auction.announceClosed();
-		application.showSniperHasLostAuction();
+		application.showsSniperHasLostAuction();
 		
 	}
 	
@@ -57,7 +57,80 @@ public class AuctionSniperEndToEndTest {
 		auction.hasReceivedBid(1098, ApplicationRunner.SNIPER_XMPP_ID);
 		
 		auction.announceClosed();
-		application.showSniperHasLostAuction();
+		application.showsSniperHasLostAuction();
 	}
+	
+	
+	@Test
+	public void sniper_wins_an_auction_by_making_a_higher_bid() throws Exception {
+		auction.startSellingItem();
+		
+		application.startBiddingIn(auction);
+		auction.hasReceivedJoinRequestFromSniper(ApplicationRunner.SNIPER_XMPP_ID);
+		
+		auction.reportPrice(1000, 98, "other bidder");
+		application.hasShownSniperIsBidding();
+		
+		auction.hasReceivedBid(1098, ApplicationRunner.SNIPER_XMPP_ID);
+		
+		auction.reportPrice(1098, 97, ApplicationRunner.SNIPER_XMPP_ID);
+		application.hasShownSniperIsWinning();
+		
+		auction.announceClosed();
+		application.showsSniperHasWonAuction();
+	}
+	
+	
+	@Test
+	public void sniper_wins_an_auction_by_making_serveral_higher_bids() throws Exception {
+		auction.startSellingItem();
+		
+		application.startBiddingIn(auction);
+		auction.hasReceivedJoinRequestFromSniper(ApplicationRunner.SNIPER_XMPP_ID);
+		
+		auction.reportPrice(1000, 98, "other bidder");
+		application.hasShownSniperIsBidding();
+		
+		auction.hasReceivedBid(1098, ApplicationRunner.SNIPER_XMPP_ID);
+		
+		auction.reportPrice(1098, 97, ApplicationRunner.SNIPER_XMPP_ID);
+		application.hasShownSniperIsWinning();
+		
+		auction.reportPrice(1195, 97, "other bidder");
+		application.hasShownSniperIsBidding();
+		
+		
+		auction.reportPrice(1292, 97, ApplicationRunner.SNIPER_XMPP_ID);
+		application.hasShownSniperIsWinning();
+		
+		
+		auction.announceClosed();
+		application.showsSniperHasWonAuction();
+	}
+	
+	
+	
+	@Test
+	public void sniper_loses_an_auction_by_being_out_bid_at_the_end_of_the_auction() throws Exception {
+		auction.startSellingItem();
+		
+		application.startBiddingIn(auction);
+		auction.hasReceivedJoinRequestFromSniper(ApplicationRunner.SNIPER_XMPP_ID);
+		
+		auction.reportPrice(1000, 98, "other bidder");
+		application.hasShownSniperIsBidding();
+		
+		auction.hasReceivedBid(1098, ApplicationRunner.SNIPER_XMPP_ID);
+		
+		auction.reportPrice(1098, 97, ApplicationRunner.SNIPER_XMPP_ID);
+		application.hasShownSniperIsWinning();
+		
+		auction.reportPrice(1195, 97, "other bidder");
+		application.hasShownSniperIsBidding();
+		
+		auction.announceClosed();
+		application.showsSniperHasLostAuction();
+	}
+	
 	
 }

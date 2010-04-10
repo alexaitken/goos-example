@@ -14,7 +14,7 @@ import com.alexaitken.auctionsniper.AuctionMessageTranslator;
 import com.alexaitken.auctionsniper.AuctionSniper;
 import com.alexaitken.auctionsniper.SniperListener;
 
-public class Main implements SniperListener {
+public class Main {
 	
 	public static final String AUCTION_RESOURCE = "Auction";
 	public static final String ITEM_ID_AS_LOGIN = "auction-%s";
@@ -58,7 +58,7 @@ public class Main implements SniperListener {
 		
 		Auction auction =  new XMPPAuction(chat);
 		
-		chat.addMessageListener(new AuctionMessageTranslator(new AuctionSniper(auction, this)));
+		chat.addMessageListener(new AuctionMessageTranslator(new AuctionSniper(auction, new SinperStateDisplayer()), connection.getUser()));
 		auction.join();
 	}
 
@@ -90,24 +90,7 @@ public class Main implements SniperListener {
 		
 	}
 
-	public void sniperLost() {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				ui.showStatus(MainWindow.STATUS_LOST);
-			}
-		});
-		
-	}
-
-	@Override
-	public void sniperBidding() {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				ui.showStatus(MainWindow.STATUS_BIDDING);
-			}
-		});
-		
-	}
+	
 
 
 	
@@ -130,6 +113,19 @@ public class Main implements SniperListener {
 					ui.showStatus(status);
 				}
 			});
+		}
+
+
+		@Override
+		public void sniperWinning() {
+			showStatus(MainWindow.STATUS_WINNING);
+		}
+
+
+		@Override
+		public void sniperWon() {
+			showStatus(MainWindow.STATUS_WON);
+			
 		}
 
 

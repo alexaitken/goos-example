@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Auction Sniper" default="build.full">
+	<property name="jvmVersion" value="1.6"/>
     <property name="build.dir" location="build" />
     <property name="src.dir" location="src" />
     <property name="test.dir" location="test"/>
     <property name="lib.dir" value="libs" />
+	<property name="test.acceptance.src.dir" location="${test.dir}/acceptance" />
+	<property name="test.unit.src.dir" location="${test.dir}/unit" />
     <property name="app.classes.dir" location="${build.dir}/classes/app" />
     <property name="test.classes.dir" location="${build.dir}/classes/test" />
+	<property name="test.unit.classes.dir" location="${test.classes.dir}/unit" />
+	<property name="test.acceptance.classes.dir" location="${test.classes.dir}/acceptance" />
+	
     
     <path id="app.lib.path">
         <fileset dir="${lib.dir}/deploy" includes="*.jar"/>
@@ -28,20 +34,33 @@
                srcdir="${app.src.dir}"
                classpathref="app.lib.path" 
         	   debug="on"
-        	   source="1.6"
-        	   target="1.6"/>
+        	   source="${jvmVersion}"
+        	   target="${jvmVersion}"/>
     </target>
 
-    <target name="test.acceptance.compile"
+	
+	 <target name="test.acceptance.compile"
+	        	depends="app.compile">
+	        
+	    	<mkdir dir="${test.acceptance.classes.dir}" />
+	        <javac destdir="${test.acceptance.classes.dir}"
+	               srcdir="${test.acceptance.src.dir}"
+	               classpathref="test.lib.path"
+	               debug="on"
+	        	   source="${jvmVersion}"
+	        	   target="${jvmVersion}"	/>
+	    </target>
+	
+    <target name="test.unit.compile"
         	depends="app.compile">
-        <property name="test.src.dir" location="${test.dir}/acceptance" />
-    	<mkdir dir="${test.classes.dir}" />
-        <javac destdir="${test.classes.dir}"
-               srcdir="${test.src.dir}"
+        
+    	<mkdir dir="${test.unit.classes.dir}" />
+        <javac destdir="${test.unit.classes.dir}"
+               srcdir="${test.unit.src.dir}"
                classpathref="test.lib.path"
                debug="on"
-        	   source="1.6"
-        	   target="1.6"	/>
+        	   source="${jvmVersion}"
+        	   target="${jvmVersion}"	/>
     </target>
     
     <target name="openfire.check">
@@ -50,25 +69,43 @@
         </waitfor>
     </target>
     
+	
+	<target name="test.unit.run"
+	    		description="Run the tests" 
+	    		depends="clean, test.unit.compile" >
+        <property name="test.unit.reports.dir" location="${build.dir}/testreports/unit"/>
+        <mkdir dir="${test.unit.reports.dir}"/>
+        <junit  showoutput="true">
+            <batchtest todir="${test.unit.reports.dir}" haltonfailure="true" haltonerror="true">
+                <formatter type="xml"/>
+                <fileset dir="${test.dir}/unit" includes="**/*Test.java" />
+            </batchtest>
+            <classpath>
+                <path refid="test.lib.path" />
+                <path location="${test.unit.classes.dir}" />
+            </classpath>
+        </junit>
+    </target>
+	
     <target name="test.acceptance.run"
     		description="Run the tests" 
     		depends="test.acceptance.compile, openfire.check" >
         <fail message="OpenFire is not running" if="openfire.is.down"/>
-        <property name="test.reports.dir" location="${build.dir}/testreports"/>
-        <mkdir dir="${test.reports.dir}"/>
+        <property name="test.acceptance.reports.dir" location="${build.dir}/testreports/acceptance"/>
+        <mkdir dir="${test.acceptance.reports.dir}"/>
         <junit  showoutput="true">
-            <batchtest todir="${test.reports.dir}" haltonfailure="true" haltonerror="true">
-                <formatter type="xml"/>
+            <batchtest todir="${test.acceptance.reports.dir}" haltonfailure="true" haltonerror="true">
+            	<formatter type="xml"/>
                 <fileset dir="${test.dir}/acceptance" includes="**/*Test.java" />
             </batchtest>
             <classpath>
                 <path refid="test.lib.path" />
-                <path location="${test.classes.dir}" />
+                <path location="${test.acceptance.classes.dir}" />
             </classpath>
         </junit>
     </target>
     
     <target name="build.full"
     	description="Clean, build, and full test" 
-   		depends="clean, test.acceptance.run" />
+   		depends="clean, test.unit.run, test.acceptance.run" />
 </project>

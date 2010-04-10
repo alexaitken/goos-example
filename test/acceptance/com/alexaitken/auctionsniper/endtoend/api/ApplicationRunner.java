@@ -4,14 +4,13 @@ import static com.alexaitken.auctionsniper.ui.MainWindow.*;
 
 import com.alexaitken.auctionsniper.endtoend.api.drivers.AuctionSniperDriver;
 import com.alexaitken.auctionsniper.ui.Main;
+import com.alexaitken.auctionsniper.ui.MainWindow;
 
 public class ApplicationRunner {
 	protected static final String XMPP_HOST = "localhost";
 
 	public static final String SNIPER_XMPP_ID = "sniper@sideshow-bob.local/Smack";
 
-	
-	
 	private final String SNIPER_ID = "sniper";
 	private final String SNIPPER_PASSWORD = "sniper";
 	
@@ -35,7 +34,7 @@ public class ApplicationRunner {
 		driver.showsSniperStatus(STATUS_JOINING);
 	}
 
-	public void showSniperHasLostAuction() {
+	public void showsSniperHasLostAuction() {
 		driver.showsSniperStatus(STATUS_LOST);
 	}
 
@@ -47,6 +46,16 @@ public class ApplicationRunner {
 
 	public void hasShownSniperIsBidding() {
 		driver.showsSniperStatus(STATUS_BIDDING); 		
+	}
+
+	public void showsSniperHasWonAuction() {
+		driver.showsSniperStatus(MainWindow.STATUS_WON);
+		
+	}
+
+	public void hasShownSniperIsWinning() {
+		driver.showsSniperStatus(MainWindow.STATUS_WINNING);
+		
 	}
 
 }
