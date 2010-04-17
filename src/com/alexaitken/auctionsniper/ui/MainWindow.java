@@ -1,10 +1,13 @@
 package com.alexaitken.auctionsniper.ui;
 
-import java.awt.Color;
+import java.awt.BorderLayout;
+import java.awt.Container;
 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.border.LineBorder;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+
+import com.alexaitken.auctionsniper.SniperSnapshot;
 
 public class MainWindow extends JFrame {
 	public static final String STATUS_JOINING = "JOIN";
@@ -13,20 +16,20 @@ public class MainWindow extends JFrame {
 	public static final String STATUS_WINNING = "WINNING";
 	public static final String STATUS_WON = "WON";
 	
-	private final JLabel sniperStatus = createLabel(STATUS_JOINING);
 	
 	public static final String SNIPER_STATUS_NAME = "sniperStatus";
 	public static final String MAIN_WINDOW_NAME = "mainWindow";
+	private static final String SNIPERS_TABLE = "snipersTable";
 	
-	
+	private final SnipersTableModel snipers = new SnipersTableModel();
 	
 	
 	public MainWindow() {
 		super("Auction Sniper");
 
 		setName(MainWindow.MAIN_WINDOW_NAME);
-		add(sniperStatus);
 		
+		fillContentPane(makeSnipersTable());
 		
 		pack();
 		
@@ -34,18 +37,33 @@ public class MainWindow extends JFrame {
 		setVisible(true);
 	}
 
-
-	private JLabel createLabel(String initialText) {
-		JLabel result = new JLabel(initialText);
-		result.setName(MainWindow.SNIPER_STATUS_NAME);
-		result.setBorder(new LineBorder(Color.BLACK));
-		return result;
+	
+	private void fillContentPane(JTable snipersTable) {
+		final Container contentPane = getContentPane();
+		contentPane.setLayout(new BorderLayout());
+		
+		contentPane.add(new JScrollPane(snipersTable), BorderLayout.CENTER);
+		
 	}
 
 
-	public void showStatus(String newStatus) {
-		sniperStatus.setText(newStatus);
+	private JTable makeSnipersTable() {
+		JTable snipersTable = new JTable(snipers);
+		snipersTable.setName(SNIPERS_TABLE);
+		return snipersTable;
+	}
 
+	
+
+
+	public void showStatus(String newStatus) {
+		snipers.setStatusText(newStatus);
+
+	}
+
+
+	public void sniperStatusChanged(SniperSnapshot sniperSnapshot) {
+		snipers.sniperStatusChanged(sniperSnapshot);
 	}
 
 

@@ -1,17 +1,18 @@
 /**
  * 
  */
-package com.alexaitken.auctionsniper.ui;
+package com.alexaitken.auctionsniper.xmpp;
 
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.XMPPException;
 
 import com.alexaitken.auctionsniper.Auction;
+import com.alexaitken.auctionsniper.ui.Main;
 
 public class XMPPAuction implements Auction {
 	private final Chat chat;
 
-	XMPPAuction(Chat chat) {
+	public XMPPAuction(Chat chat) {
 		this.chat = chat;
 	}
 

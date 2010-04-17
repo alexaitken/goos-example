@@ -13,6 +13,8 @@ import com.alexaitken.auctionsniper.Auction;
 import com.alexaitken.auctionsniper.AuctionMessageTranslator;
 import com.alexaitken.auctionsniper.AuctionSniper;
 import com.alexaitken.auctionsniper.SniperListener;
+import com.alexaitken.auctionsniper.SniperSnapshot;
+import com.alexaitken.auctionsniper.xmpp.XMPPAuction;
 
 public class Main {
 	
@@ -58,8 +60,9 @@ public class Main {
 		
 		Auction auction =  new XMPPAuction(chat);
 		
-		chat.addMessageListener(new AuctionMessageTranslator(new AuctionSniper(auction, new SinperStateDisplayer()), connection.getUser()));
+		chat.addMessageListener(new AuctionMessageTranslator(new AuctionSniper(auction, new SinperStateDisplayer(), itemNumber), connection.getUser()));
 		auction.join();
+		
 	}
 
 
@@ -91,21 +94,14 @@ public class Main {
 	}
 
 	
-
-
 	
 	public class SinperStateDisplayer implements SniperListener {
-
+		
 		public void sniperLost() {
 			showStatus(MainWindow.STATUS_LOST);
 			
 		}
 
-		
-		@Override
-		public void sniperBidding() {
-			showStatus(MainWindow.STATUS_BIDDING);
-		}
 		
 		private void showStatus(final String status) {
 			SwingUtilities.invokeLater(new Runnable() {
@@ -117,14 +113,19 @@ public class Main {
 
 
 		@Override
-		public void sniperWinning() {
-			showStatus(MainWindow.STATUS_WINNING);
+		public void sniperWon() {
+			showStatus(MainWindow.STATUS_WON);
+			
 		}
 
 
 		@Override
-		public void sniperWon() {
-			showStatus(MainWindow.STATUS_WON);
+		public void sniperStateChanged(final SniperSnapshot sniperSnapshot) {
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					ui.sniperStatusChanged(sniperSnapshot);
+				}
+			});
 			
 		}
 
