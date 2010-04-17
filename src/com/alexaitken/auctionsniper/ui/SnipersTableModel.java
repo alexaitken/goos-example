@@ -7,7 +7,9 @@ import com.alexaitken.auctionsniper.SniperSnapshot;
 public class SnipersTableModel extends AbstractTableModel {
 	private static String[] STATUS_TEXT = { MainWindow.STATUS_JOINING,
 											MainWindow.STATUS_BIDDING,
-											MainWindow.STATUS_WINNING};
+											MainWindow.STATUS_WINNING,
+											MainWindow.STATUS_LOST,
+											MainWindow.STATUS_WON };
 
 	private static final SniperSnapshot START_UP = new SniperSnapshot("", 0, 0);
 
@@ -40,11 +42,6 @@ public class SnipersTableModel extends AbstractTableModel {
 		}
 	}
 	
-	public void setStatusText(String statusText) {
-		this.statusText = statusText;
-		fireTableCellUpdated(0, 0);
-	}
-
 	public void sniperStatusChanged(SniperSnapshot newSniperSnapshot) {
 		this.sniperSnapshot = newSniperSnapshot;
 		this.statusText = STATUS_TEXT[newSniperSnapshot.state.ordinal()];

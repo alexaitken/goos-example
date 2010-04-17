@@ -42,12 +42,16 @@ public class SniperSnapshot {
 		return new SniperSnapshot(itemId, 0, 0, SniperState.JOINING);
 	}
 
-	public SniperSnapshot bidding(AuctionSniper auctionSniper, int price, int bid) {
-		return new SniperSnapshot(auctionSniper.itemId, price, bid, SniperState.BIDDING);
+	public SniperSnapshot bidding(int price, int bid) {
+		return new SniperSnapshot(itemId, price, bid, SniperState.BIDDING);
 	}
 
-	public SniperSnapshot winning(AuctionSniper auctionSniper, int price) {
-		return new SniperSnapshot(auctionSniper.itemId, price, price, SniperState.WINNING);
+	public SniperSnapshot winning(int price) {
+		return new SniperSnapshot(itemId, price, price, SniperState.WINNING);
+	}
+
+	public SniperSnapshot closed() {
+		return new SniperSnapshot(itemId, lastPrice, lastPrice, state.whenAuctionClosed());
 	}
 	
 	
