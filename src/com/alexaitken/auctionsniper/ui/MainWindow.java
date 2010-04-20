@@ -7,25 +7,19 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
-import com.alexaitken.auctionsniper.SniperSnapshot;
-
 public class MainWindow extends JFrame {
-	public static final String STATUS_JOINING = "JOIN";
-	public static final String STATUS_LOST = "LOST";
-	public static final String STATUS_BIDDING = "BIDDING";
-	public static final String STATUS_WINNING = "WINNING";
-	public static final String STATUS_WON = "WON";
-	
-	
 	public static final String SNIPER_STATUS_NAME = "sniperStatus";
 	public static final String MAIN_WINDOW_NAME = "mainWindow";
+	public static final String APPLICATION_TITLE = "Auction Sniper";
+	
 	private static final String SNIPERS_TABLE = "snipersTable";
 	
-	private final SnipersTableModel snipers = new SnipersTableModel();
 	
+	private final SnipersTableModel snipers;
 	
-	public MainWindow() {
-		super("Auction Sniper");
+	public MainWindow(SnipersTableModel snipers) {
+		super(APPLICATION_TITLE);
+		this.snipers = snipers;
 
 		setName(MainWindow.MAIN_WINDOW_NAME);
 		
@@ -52,13 +46,5 @@ public class MainWindow extends JFrame {
 		snipersTable.setName(SNIPERS_TABLE);
 		return snipersTable;
 	}
-
-	
-
-
-	public void sniperStatusChanged(SniperSnapshot sniperSnapshot) {
-		snipers.sniperStatusChanged(sniperSnapshot);
-	}
-
 
 }

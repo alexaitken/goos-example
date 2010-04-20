@@ -17,18 +17,16 @@ import com.alexaitken.auctionsniper.SniperSnapshot;
 import com.alexaitken.auctionsniper.xmpp.XMPPAuction;
 
 public class Main {
-	
+
 	public static final String AUCTION_RESOURCE = "Auction";
 	public static final String ITEM_ID_AS_LOGIN = "auction-%s";
 	public static final String AUCTION_ID_FORMAT = ITEM_ID_AS_LOGIN + "@%s/" + AUCTION_RESOURCE;
 	public static final String BID_COMMAND_FORMAT = "SOLVersion: 1.1; Event: BID; Price: %d;";
 	public static final String JOIN_COMMAND_FORMAT = "SOLVersion: 1.1; Event: JOIN;";
 
-	
-	
-	public static void main(String ...args) throws Exception {
+	public static void main(String... args) throws Exception {
 		Main main = new Main();
-		main.joinAuction(connectTo(args[0], args[1], args[2]),args[3]);
+		main.joinAuction(connectTo(args[0], args[1], args[2]), args[3]);
 	}
 
 	private static XMPPConnection connectTo(String hostName, String signIn, String password) throws XMPPException {
@@ -37,35 +35,30 @@ public class Main {
 		xmppConnection.login(signIn, password);
 		return xmppConnection;
 	}
-	
 
-	
+	private final SnipersTableModel snipers = new SnipersTableModel();
 	private MainWindow ui;
-	
+
 	@SuppressWarnings("unused")
 	private Chat notToBeGcd;
-	
-	
-	
+
 	public Main() throws Exception {
 		startUserInterface();
 	}
-	
-
 
 	private void joinAuction(XMPPConnection connection, String itemNumber) throws XMPPException {
 		disconnectWhenUICloses(connection);
 		final Chat chat = connection.getChatManager().createChat(autionId(connection, itemNumber), null);
 		this.notToBeGcd = chat;
+
+		Auction auction = new XMPPAuction(chat);
+
+		chat.addMessageListener(new AuctionMessageTranslator(
+				new AuctionSniper(auction, new SwingThreadSniperListener(snipers), itemNumber), connection.getUser()));
 		
-		Auction auction =  new XMPPAuction(chat);
 		
-		chat.addMessageListener(new AuctionMessageTranslator(new AuctionSniper(auction, new SinperStateDisplayer(), itemNumber), connection.getUser()));
 		auction.join();
-		
 	}
-
-
 
 	private void disconnectWhenUICloses(final XMPPConnection connection) {
 		ui.addWindowListener(new WindowAdapter() {
@@ -73,43 +66,39 @@ public class Main {
 				connection.disconnect();
 			}
 		});
-		
+
 	}
 
 	private static String autionId(XMPPConnection connection, String itemNumber) {
 		return String.format(AUCTION_ID_FORMAT, itemNumber, connection.getServiceName());
 	}
 
-
-
-	
 	private void startUserInterface() throws Exception {
 		SwingUtilities.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
-				ui = new MainWindow();
+				ui = new MainWindow(snipers);
 			}
 		});
-		
+
 	}
 
-	
-	
-	public class SinperStateDisplayer implements SniperListener {
-		
-		
+	public class SwingThreadSniperListener implements SniperListener {
+		private final SniperListener delagate;
+
+		private SwingThreadSniperListener(SniperListener delagate) {
+			this.delagate = delagate;
+		}
+
 		@Override
 		public void sniperStateChanged(final SniperSnapshot sniperSnapshot) {
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
-					ui.sniperStatusChanged(sniperSnapshot);
+					delagate.sniperStateChanged(sniperSnapshot);
 				}
 			});
-			
-		}
 
+		}
 
 	}
 }
-
-

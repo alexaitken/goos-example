@@ -11,10 +11,6 @@ public class SniperSnapshot {
 	public final int lastBid;
 	public final SniperState state;
 	
-	public SniperSnapshot(String itemId, int lastPrice, int lastBid) {
-		this(itemId, lastPrice, lastBid, null);
-	}
-
 	public SniperSnapshot(String itemId, int lastPrice, int lastBid, SniperState state) {
 		this.itemId = itemId;
 		this.lastPrice = lastPrice;

@@ -1,5 +1,6 @@
 package com.alexaitken.test.auctionsniper;
 
+import static com.alexaitken.auctionsniper.ui.SnipersTableModel.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
@@ -17,7 +18,6 @@ import org.junit.runner.RunWith;
 import com.alexaitken.auctionsniper.SniperSnapshot;
 import com.alexaitken.auctionsniper.SniperState;
 import com.alexaitken.auctionsniper.ui.Column;
-import com.alexaitken.auctionsniper.ui.MainWindow;
 import com.alexaitken.auctionsniper.ui.SnipersTableModel;
 
 @RunWith(JMock.class)
@@ -41,12 +41,19 @@ public class SnipersTableModelTest {
 		context.checking(new Expectations() {{
 				ignoring(listener);
 			}});
-		model.sniperStatusChanged(new SniperSnapshot("item id", 555, 666, SniperState.BIDDING));
+		model.sniperStateChanged(new SniperSnapshot("item id", 555, 666, SniperState.BIDDING));
 		
 		assertColumnEquals(Column.ITEM_IDENTIFIER, "item id");
 		assertColumnEquals(Column.LAST_PRICE, 555);
 		assertColumnEquals(Column.LAST_BID, 666);
-		assertColumnEquals(Column.SNIPER_STATE, MainWindow.STATUS_BIDDING);
+		assertColumnEquals(Column.SNIPER_STATE, textFor(SniperState.BIDDING));
+	}
+	
+	@Test
+	public void should_set_up_the_columns_correctly() throws Exception {
+		for (Column column: Column.values()) {
+			assertEquals(column.name, model.getColumnName(column.ordinal()));
+		}
 	}
 	
 	@Test
@@ -55,7 +62,7 @@ public class SnipersTableModelTest {
 				one(listener).tableChanged(with(aRowChangedEvent()));
 			}});
 		
-		model.sniperStatusChanged(new SniperSnapshot("item id", 555, 666, SniperState.BIDDING));
+		model.sniperStateChanged(new SniperSnapshot("item id", 555, 666, SniperState.BIDDING));
 	}
 
 	private void assertColumnEquals(Column column, Object expected) {
