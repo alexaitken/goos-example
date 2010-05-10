@@ -1,14 +1,16 @@
 package com.alexaitken.auctionsniper.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.table.AbstractTableModel;
 
+import com.alexaitken.auctionsniper.Defect;
 import com.alexaitken.auctionsniper.SniperListener;
 import com.alexaitken.auctionsniper.SniperSnapshot;
 import com.alexaitken.auctionsniper.SniperState;
 
 public class SnipersTableModel extends AbstractTableModel implements SniperListener {
-	private static final SniperSnapshot START_UP = new SniperSnapshot("", 0, 0, SniperState.JOINING);
-	
 	private static final String[] STATUS_TEXT = { "JOIN", "BIDDING", "WINNING", "LOST", "WON" };
 	
 	public static String textFor(SniperState state) {
@@ -16,8 +18,7 @@ public class SnipersTableModel extends AbstractTableModel implements SniperListe
 	}
 
 	
-	private SniperSnapshot sniperSnapshot = START_UP;
-
+	private List<SniperSnapshot> sniperSnapshots = new ArrayList<SniperSnapshot>();
 	
 	
 	
@@ -33,17 +34,36 @@ public class SnipersTableModel extends AbstractTableModel implements SniperListe
 
 	@Override
 	public int getRowCount() {
-		return 1;
+		return sniperSnapshots.size();
 	}
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		return Column.at(columnIndex).valueIn(sniperSnapshot);
+		return Column.at(columnIndex).valueIn(sniperSnapshots.get(rowIndex));
 	}
 	
 	public void sniperStateChanged(SniperSnapshot newSniperSnapshot) {
-		this.sniperSnapshot = newSniperSnapshot;
-		fireTableRowsUpdated(0, 0);
+		int row = rowMatching(newSniperSnapshot);
+		
+		sniperSnapshots.set(row, newSniperSnapshot);
+		fireTableRowsUpdated(row, row);
 	}
+
+	private int rowMatching(SniperSnapshot snapshot) {
+		for (int i = 0; i < sniperSnapshots.size(); i++) {
+			if (snapshot.isForSameItemAs(sniperSnapshots.get(i))) {
+				return i;
+			}
+		}
+		throw new Defect("Cannot find match for " + snapshot);
+	}
+
+	public void addSniper(SniperSnapshot newSniper) {
+		sniperSnapshots.add(newSniper);
+		int row = rowMatching(newSniper);
+		fireTableRowsInserted(row, row);
+	}
+	
+	
 
 }

@@ -12,6 +12,7 @@ public class AuctionSniper implements AuctionEventListener {
 		this.auction = auction;
 		this.sniperListener = sniperListener;
 		this.snapshot = SniperSnapshot.joining(itemId);
+		
 	}
 
 

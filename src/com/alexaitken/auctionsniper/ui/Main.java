@@ -26,7 +26,13 @@ public class Main {
 
 	public static void main(String... args) throws Exception {
 		Main main = new Main();
-		main.joinAuction(connectTo(args[0], args[1], args[2]), args[3]);
+		XMPPConnection connection = connectTo(args[0], args[1], args[2]);
+		main.disconnectWhenUICloses(connection);
+		
+		for (int i = 3; i < args.length; i++) {
+			main.joinAuction(connection, args[i]);
+		}
+		
 	}
 
 	private static XMPPConnection connectTo(String hostName, String signIn, String password) throws XMPPException {
@@ -46,8 +52,7 @@ public class Main {
 		startUserInterface();
 	}
 
-	private void joinAuction(XMPPConnection connection, String itemNumber) throws XMPPException {
-		disconnectWhenUICloses(connection);
+	private void joinAuction(XMPPConnection connection, String itemNumber) throws Exception {
 		final Chat chat = connection.getChatManager().createChat(autionId(connection, itemNumber), null);
 		this.notToBeGcd = chat;
 
@@ -58,6 +63,16 @@ public class Main {
 		
 		
 		auction.join();
+		safetlyAddItemToModel(itemNumber);
+		
+	}
+
+	private void safetlyAddItemToModel(final String itemNumber) throws Exception {
+		SwingUtilities.invokeAndWait(new Runnable() {
+			public void run() {
+				snipers.addSniper(SniperSnapshot.joining(itemNumber));
+			}
+		});
 	}
 
 	private void disconnectWhenUICloses(final XMPPConnection connection) {
