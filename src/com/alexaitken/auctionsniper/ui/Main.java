@@ -2,6 +2,8 @@ package com.alexaitken.auctionsniper.ui;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.SwingUtilities;
 
@@ -29,10 +31,28 @@ public class Main {
 		XMPPConnection connection = connectTo(args[0], args[1], args[2]);
 		main.disconnectWhenUICloses(connection);
 		
-		for (int i = 3; i < args.length; i++) {
-			main.joinAuction(connection, args[i]);
-		}
+		main.addUserRquestListenerFor(connection);
 		
+	}
+
+	private void addUserRquestListenerFor(final XMPPConnection connection) {
+		ui.addUserRequestListener(new UserRequestListener() {
+			@Override
+			public void joinAuction(String itemId) {
+				snipers.addSniper(SniperSnapshot.joining(itemId));
+				
+				Chat chat = connection.getChatManager().createChat(autionId(connection, itemId), null);
+				notToBeGcd.add(chat);
+
+				Auction auction = new XMPPAuction(chat);
+
+				chat.addMessageListener(new AuctionMessageTranslator(
+						new AuctionSniper(auction, new SwingThreadSniperListener(snipers), itemId), connection.getUser()));
+				
+				
+				auction.join();
+			}
+		});
 	}
 
 	private static XMPPConnection connectTo(String hostName, String signIn, String password) throws XMPPException {
@@ -45,35 +65,14 @@ public class Main {
 	private final SnipersTableModel snipers = new SnipersTableModel();
 	private MainWindow ui;
 
-	@SuppressWarnings("unused")
-	private Chat notToBeGcd;
+	private Set<Chat> notToBeGcd = new HashSet<Chat>();
 
 	public Main() throws Exception {
 		startUserInterface();
 	}
 
-	private void joinAuction(XMPPConnection connection, String itemNumber) throws Exception {
-		final Chat chat = connection.getChatManager().createChat(autionId(connection, itemNumber), null);
-		this.notToBeGcd = chat;
+	
 
-		Auction auction = new XMPPAuction(chat);
-
-		chat.addMessageListener(new AuctionMessageTranslator(
-				new AuctionSniper(auction, new SwingThreadSniperListener(snipers), itemNumber), connection.getUser()));
-		
-		
-		auction.join();
-		safetlyAddItemToModel(itemNumber);
-		
-	}
-
-	private void safetlyAddItemToModel(final String itemNumber) throws Exception {
-		SwingUtilities.invokeAndWait(new Runnable() {
-			public void run() {
-				snipers.addSniper(SniperSnapshot.joining(itemNumber));
-			}
-		});
-	}
 
 	private void disconnectWhenUICloses(final XMPPConnection connection) {
 		ui.addWindowListener(new WindowAdapter() {
