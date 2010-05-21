@@ -9,8 +9,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.alexaitken.auctionsniper.AuctionEventListener;
-import com.alexaitken.auctionsniper.AuctionMessageTranslator;
 import com.alexaitken.auctionsniper.AuctionEventListener.PriceSource;
+import com.alexaitken.auctionsniper.xmpp.AuctionMessageTranslator;
 
 
 @RunWith(JMock.class)

@@ -14,6 +14,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import com.alexaitken.auctionsniper.Announcer;
+import com.alexaitken.auctionsniper.SniperPortfolio;
 
 public class MainWindow extends JFrame {
 	public static final String SNIPER_STATUS_NAME = "sniperStatus";
@@ -29,12 +30,15 @@ public class MainWindow extends JFrame {
 	
 	private final Announcer<UserRequestListener> userRequests = Announcer.to(UserRequestListener.class);
 	
-	public MainWindow(SnipersTableModel snipers) {
+	
+	public MainWindow(SniperPortfolio portfolio) {
 		super(APPLICATION_TITLE);
-
 		setName(MainWindow.MAIN_WINDOW_NAME);
 		
-		fillContentPane(makeSnipersTable(snipers), makeControls());
+		SnipersTableModel model = new SnipersTableModel();
+		portfolio.addPortfolioListener(model);
+		
+		fillContentPane(makeSnipersTable(model), makeControls());
 		
 		pack();
 		

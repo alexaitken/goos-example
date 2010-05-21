@@ -1,16 +1,16 @@
 package com.alexaitken.auctionsniper;
 
 
-public class AuctionSniper implements AuctionEventListener {
 
-	private final SniperListener sniperListener;
+
+public class AuctionSniper implements AuctionEventListener {
+	private final Announcer<SniperListener> listeners = Announcer.to(SniperListener.class);
 	private final Auction auction;
 
 	private SniperSnapshot snapshot;
 
-	public AuctionSniper(Auction auction, SniperListener sniperListener, String itemId) {
+	public AuctionSniper(Auction auction, String itemId) {
 		this.auction = auction;
-		this.sniperListener = sniperListener;
 		this.snapshot = SniperSnapshot.joining(itemId);
 		
 	}
@@ -23,7 +23,7 @@ public class AuctionSniper implements AuctionEventListener {
 
 
 	private void notifyChange() {
-		sniperListener.sniperStateChanged(snapshot);
+		listeners.announce().sniperStateChanged(snapshot);
 	}
 
 
@@ -42,5 +42,16 @@ public class AuctionSniper implements AuctionEventListener {
 		notifyChange();
 		
 	}
+
+
+	public SniperSnapshot getSnapshot() {
+		return snapshot;
+	}
+
+
+	public void addSniperListener(SniperListener sniperListener) {
+		listeners.addListener(sniperListener);
+	}
+
 
 }

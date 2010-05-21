@@ -1,4 +1,4 @@
-package com.alexaitken.auctionsniper;
+package com.alexaitken.auctionsniper.xmpp;
 
 import static java.lang.Integer.*;
 
@@ -9,6 +9,7 @@ import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.packet.Message;
 
+import com.alexaitken.auctionsniper.AuctionEventListener;
 import com.alexaitken.auctionsniper.AuctionEventListener.PriceSource;
 
 public class AuctionMessageTranslator implements MessageListener {

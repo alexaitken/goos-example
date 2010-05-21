@@ -1,5 +1,7 @@
 package com.alexaitken.auctionsniper;
 
-public interface SniperListener {
+import java.util.EventListener;
+
+public interface SniperListener extends EventListener {
 	public void sniperStateChanged(SniperSnapshot sniperSnapshot);
 }

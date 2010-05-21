@@ -14,7 +14,7 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 
-import com.alexaitken.auctionsniper.ui.Main;
+import com.alexaitken.auctionsniper.xmpp.XMPPAuctionHouse;
 
 public class FakeAuctionServer {
 	
@@ -34,7 +34,7 @@ public class FakeAuctionServer {
 
 	public void startSellingItem() throws XMPPException {
 		connection.connect();
-		connection.login(String.format(Main.ITEM_ID_AS_LOGIN, itemId), AUCTION_PASSWORD, AUCTION_RESOURCE);
+		connection.login(String.format(XMPPAuctionHouse.ITEM_ID_AS_LOGIN, itemId), AUCTION_PASSWORD, AUCTION_RESOURCE);
 		connection.getChatManager().addChatListener(
 				new ChatManagerListener() {
 					@Override
@@ -55,7 +55,7 @@ public class FakeAuctionServer {
 	}
 
 	public void hasReceivedJoinRequestFromSniper(String sniperId) throws InterruptedException {
-		hasReceivedAMessageMatching(sniperId, equalTo(Main.JOIN_COMMAND_FORMAT));
+		hasReceivedAMessageMatching(sniperId, equalTo(XMPPAuctionHouse.JOIN_COMMAND_FORMAT));
 	}
 
 	public void announceClosed() throws XMPPException {
@@ -63,7 +63,7 @@ public class FakeAuctionServer {
 	}
 	
 	public void hasReceivedBid(int bid, String sniperId) throws InterruptedException {
-		hasReceivedAMessageMatching(sniperId, equalTo(String.format(Main.BID_COMMAND_FORMAT, bid)));
+		hasReceivedAMessageMatching(sniperId, equalTo(String.format(XMPPAuctionHouse.BID_COMMAND_FORMAT, bid)));
 	}
 	
 	private void hasReceivedAMessageMatching(String sniperId, Matcher<? super String> messageMather) throws InterruptedException {
