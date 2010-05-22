@@ -14,7 +14,7 @@ public class SniperPortfolioTest {
 	
 	@Test
 	public void should_notify_portfolio_listener_when_a_sniper_is_added() throws Exception {
-	    final AuctionSniper sniper = new AuctionSniper(null, "item 123");
+	    final AuctionSniper sniper = new AuctionSniper(null, new Item("item 123", Integer.MAX_VALUE));
 		context.checking(new Expectations() {{ 
 			oneOf(portfolioListener).sniperAdded(sniper);
 		}});

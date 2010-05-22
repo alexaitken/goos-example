@@ -5,6 +5,7 @@ import org.jivesoftware.smack.XMPPException;
 
 import com.alexaitken.auctionsniper.Auction;
 import com.alexaitken.auctionsniper.AuctionHouse;
+import com.alexaitken.auctionsniper.Item;
 
 public class XMPPAuctionHouse implements AuctionHouse {
 	public static final String AUCTION_RESOURCE = "Auction";
@@ -31,8 +32,8 @@ public class XMPPAuctionHouse implements AuctionHouse {
 	}
 	
 	@Override
-	public Auction auctionFor(String itemId) {
-		return new XMPPAuction(connection, autionId(connection, itemId));
+	public Auction auctionFor(Item item) {
+		return new XMPPAuction(connection, autionId(connection, item.identifier));
 		
 	}
 

@@ -17,6 +17,7 @@ import org.junit.runner.RunWith;
 
 import com.alexaitken.auctionsniper.AuctionSniper;
 import com.alexaitken.auctionsniper.Defect;
+import com.alexaitken.auctionsniper.Item;
 import com.alexaitken.auctionsniper.SniperSnapshot;
 import com.alexaitken.auctionsniper.SniperState;
 import com.alexaitken.auctionsniper.ui.Column;
@@ -27,7 +28,7 @@ public class SnipersTableModelTest {
 	private final Mockery context = new Mockery();
 	private final TableModelListener listener = context.mock(TableModelListener.class);
 	private final SnipersTableModel model = new SnipersTableModel();
-	private final AuctionSniper sniper = new AuctionSniper(null, "item id");
+	private final AuctionSniper sniper = new AuctionSniper(null, new Item("item id", Integer.MAX_VALUE));
 	
 	@Before
 	public void attachListener() {
@@ -99,7 +100,7 @@ public class SnipersTableModelTest {
 		}});
 		
 		model.sniperAdded(sniper);
-		model.sniperAdded(new AuctionSniper(null, "item 2"));
+		model.sniperAdded(new AuctionSniper(null, new Item("item 2", Integer.MAX_VALUE)));
 		
 		assertEquals(sniper.getSnapshot().itemId, cellValue(0, Column.ITEM_IDENTIFIER));
 		assertEquals("item 2", cellValue(1, Column.ITEM_IDENTIFIER));
@@ -108,7 +109,7 @@ public class SnipersTableModelTest {
 	
 	@Test
 	public void should_update_correct_row_for_sniper() throws Exception {
-		AuctionSniper sniper2 = new AuctionSniper(null, "item 2");
+		AuctionSniper sniper2 = new AuctionSniper(null, new Item("item 2", Integer.MAX_VALUE));
 		context.checking(new Expectations() {{
 			allowing(listener).tableChanged(with(anyInsertionEvent()));
 			

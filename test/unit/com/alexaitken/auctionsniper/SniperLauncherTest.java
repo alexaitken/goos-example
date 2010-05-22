@@ -26,7 +26,7 @@ public class SniperLauncherTest {
 	public void should_add_new_sniper_to_collector_and_then_join_auction() throws Exception {
 		final String itemId = "item 123";
 		context.checking(new Expectations() {{
-			allowing(auctionHouse).auctionFor(itemId); will(returnValue(auction));
+			allowing(auctionHouse).auctionFor(new Item(itemId, Integer.MAX_VALUE)); will(returnValue(auction));
 		      
 			oneOf(auction).addAuctionEventListener(with(sniperForItem(itemId))); when(auctionState.is("not joined"));
 			oneOf(collector).addSniper(with(sniperForItem(itemId))); when(auctionState.is("not joined"));
@@ -37,7 +37,7 @@ public class SniperLauncherTest {
 
 				
 		SniperLauncher sut = new SniperLauncher(auctionHouse, collector);
-		sut.joinAuction(itemId);
+		sut.joinAuction(new Item(itemId, Integer.MAX_VALUE));
 	}
 		
 	protected Matcher<AuctionSniper>sniperForItem(String itemId) {

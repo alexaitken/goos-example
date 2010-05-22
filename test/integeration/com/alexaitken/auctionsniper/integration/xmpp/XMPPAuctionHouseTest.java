@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import com.alexaitken.auctionsniper.Auction;
 import com.alexaitken.auctionsniper.AuctionEventListener;
+import com.alexaitken.auctionsniper.Item;
 import com.alexaitken.auctionsniper.endtoend.api.ApplicationRunner;
 import com.alexaitken.auctionsniper.endtoend.api.FakeAuctionServer;
 import com.alexaitken.auctionsniper.xmpp.XMPPAuctionHouse;
@@ -32,7 +33,7 @@ public class XMPPAuctionHouseTest {
 		CountDownLatch auctionWasClosed = new CountDownLatch(1);
 		
 		XMPPAuctionHouse auctionHouse = XMPPAuctionHouse.connect("localhost", "sniper", "sniper");
-		Auction auction = auctionHouse.auctionFor(server.getItemId());
+		Auction auction = auctionHouse.auctionFor(new Item(server.getItemId(), Integer.MAX_VALUE));
 		auction.addAuctionEventListener(auctionClosedListener(auctionWasClosed));
 		
 		auction.join();
