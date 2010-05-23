@@ -7,9 +7,11 @@
     <property name="lib.dir" value="libs" />
 	<property name="test.acceptance.src.dir" location="${test.dir}/acceptance" />
 	<property name="test.unit.src.dir" location="${test.dir}/unit" />
+	<property name="test.integration.src.dir" location="${test.dir}/integration" />
     <property name="app.classes.dir" location="${build.dir}/classes/app" />
     <property name="test.classes.dir" location="${build.dir}/classes/test" />
 	<property name="test.unit.classes.dir" location="${test.classes.dir}/unit" />
+	<property name="test.integration.classes.dir" location="${test.classes.dir}/integration" />
 	<property name="test.acceptance.classes.dir" location="${test.classes.dir}/acceptance" />
 	
     
@@ -50,6 +52,22 @@
 	        	   source="${jvmVersion}"
 	        	   target="${jvmVersion}"	/>
 	    </target>
+
+	 <target name="test.integration.compile"
+	        	depends="app.compile, test.acceptance.compile">
+	        
+    	<mkdir dir="${test.integration.classes.dir}" />
+        <javac destdir="${test.integration.classes.dir}"
+               srcdir="${test.integration.src.dir}"
+			   debug="on"
+        	   source="${jvmVersion}"
+        	   target="${jvmVersion}"	>
+        	<classpath>
+                <path refid="test.lib.path" />
+                <path location="${test.acceptance.classes.dir}" />
+            </classpath>
+        </javac>
+    </target>
 	
     <target name="test.unit.compile"
         	depends="app.compile">
@@ -105,7 +123,26 @@
         </junit>
     </target>
     
+	<target name="test.integration.run"
+	    		description="Run the tests" 
+	    		depends="test.integration.compile, openfire.check" >
+        <fail message="OpenFire is not running" if="openfire.is.down"/>
+        <property name="test.integration.reports.dir" location="${build.dir}/testreports/integration"/>
+        <mkdir dir="${test.integration.reports.dir}"/>
+        <junit  showoutput="true">
+            <batchtest todir="${test.integration.reports.dir}" haltonfailure="true" haltonerror="true">
+            	<formatter type="xml"/>
+                <fileset dir="${test.dir}/integration" includes="**/*Test.java" />
+            </batchtest>
+            <classpath>
+                <path refid="test.lib.path" />
+                <path location="${test.acceptance.classes.dir}" />
+            	<path location="${test.integration.classes.dir}" />
+            </classpath>
+        </junit>
+    </target>
+	
     <target name="build.full"
     	description="Clean, build, and full test" 
-   		depends="clean, test.unit.run, test.acceptance.run" />
+   		depends="clean, test.unit.run, test.acceptance.run, test.integration.run" />
 </project>

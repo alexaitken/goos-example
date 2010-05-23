@@ -30,7 +30,6 @@ public class MainWindowTest {
 		AuctionSniperDriver driver = new AuctionSniperDriver(100);
 		driver.startBiddingFor("an-item-id", 789);
 		driver.check(itemProbe);
-		
 	}
 	
 }
