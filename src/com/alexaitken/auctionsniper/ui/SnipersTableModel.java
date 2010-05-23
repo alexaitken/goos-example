@@ -13,7 +13,7 @@ import com.alexaitken.auctionsniper.SniperSnapshot;
 import com.alexaitken.auctionsniper.SniperState;
 
 public class SnipersTableModel extends AbstractTableModel implements SniperListener, SniperPortfolioListener {
-	private static final String[] STATUS_TEXT = { "JOIN", "BIDDING", "WINNING", "LOSING", "LOST", "WON" };
+	private static final String[] STATUS_TEXT = { "JOIN", "BIDDING", "WINNING", "LOSING", "LOST", "WON", "FAILED" };
 	
 
 	

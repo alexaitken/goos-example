@@ -21,6 +21,11 @@ public class SniperSnapshotTest {
 		assertEquals(new SniperSnapshot(itemId, 456, 234, SniperState.LOSING), bidding.losing(456));
 		
 		assertEquals(new SniperSnapshot(itemId, 456, 234, SniperState.LOST), bidding.losing(456).closed());
+		
+		assertEquals(new SniperSnapshot(itemId, 0, 0, SniperState.FAILED), bidding.failed());
+		assertEquals(new SniperSnapshot(itemId, 0, 0, SniperState.FAILED), bidding.winning(100).failed());
+		assertEquals(new SniperSnapshot(itemId, 0, 0, SniperState.FAILED), bidding.losing(100).failed());
+		assertEquals(new SniperSnapshot(itemId, 0, 0, SniperState.FAILED), bidding.failed().closed());
 
 		assertEquals(new SniperSnapshot(itemId, 123, 234, SniperState.LOST), bidding.closed());
 

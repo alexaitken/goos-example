@@ -25,7 +25,16 @@ public class AuctionMessageTranslator implements MessageListener {
 
 	@Override
 	public void processMessage(Chat chat, Message message) {
-		AuctionEvent event = AuctionEvent.from(message.getBody());
+		try {
+			translate(message.getBody());
+		} catch (Exception e) {
+			listener.auctionFailed();
+		}
+		
+	}
+
+	private void translate(String message) {
+		AuctionEvent event = AuctionEvent.from(message);
 		String type = event.type();
 
 		if ("CLOSE".equals(type)) {
@@ -35,7 +44,6 @@ public class AuctionMessageTranslator implements MessageListener {
 		} else {
 			throw new IllegalArgumentException();
 		}
-		
 	}
 
 	
@@ -60,7 +68,11 @@ public class AuctionMessageTranslator implements MessageListener {
 		}
 		
 		private String get(String fieldName) {
-			return fields.get(fieldName);
+			String value = fields.get(fieldName);
+			if (value == null) {
+				throw new MissingValueException(fieldName);
+			}
+			return value;
 		}
 		
 		private void addField(String field) {

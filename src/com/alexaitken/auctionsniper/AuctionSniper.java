@@ -23,13 +23,11 @@ public class AuctionSniper implements AuctionEventListener {
 		notifyChange();
 	}
 
-
-	private void notifyChange() {
-		listeners.announce().sniperStateChanged(snapshot);
+	public void auctionFailed() {
+		snapshot = snapshot.failed();
+		notifyChange();
 	}
 
-
-	@Override
 	public void currentPrice(int price, int increment, PriceSource priceSource) {
 		switch(priceSource) {
 		case FromSniper:
@@ -50,6 +48,12 @@ public class AuctionSniper implements AuctionEventListener {
 		notifyChange();
 		
 	}
+	
+	private void notifyChange() {
+		listeners.announce().sniperStateChanged(snapshot);
+	}
+
+
 
 
 	public SniperSnapshot getSnapshot() {
@@ -60,6 +64,8 @@ public class AuctionSniper implements AuctionEventListener {
 	public void addSniperListener(SniperListener sniperListener) {
 		listeners.addListener(sniperListener);
 	}
+
+
 
 
 }

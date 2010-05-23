@@ -51,6 +51,8 @@ public class XMPPAuctionHouseTest {
 			public void auctionClosed() {
 				auctionWasClosed.countDown();
 			}
+
+			public void auctionFailed() {}
 		};
 	}
 }
